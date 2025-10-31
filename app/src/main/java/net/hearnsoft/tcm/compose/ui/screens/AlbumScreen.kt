@@ -224,7 +224,7 @@ fun DiscHeader(discNumber: Int?, songsCount: Int?) {
         )
 
         Text(
-            text = context.getString(R.string.song_count, songsCount ?: 0),
+            text = stringResource(R.string.song_count, songsCount ?: 0),
             style = SaltTheme.textStyles.sub,
             color = SaltTheme.colors.subText,
             modifier = Modifier.align(Alignment.CenterVertically)
@@ -245,9 +245,9 @@ fun AlbumHeader(
             .padding(horizontal = 8.dp, vertical = 16.dp)
     ) {
         val subTitle = if (album.albumYear == null || album.albumYear <= 0) {
-            context.getString(R.string.song_count, album.songCount)
+            stringResource(R.string.song_count, album.songCount)
         } else {
-            context.getString(R.string.song_count_with_year, album.albumYear, album.songCount)
+            stringResource(R.string.song_count_with_year, album.albumYear, album.songCount)
         }
 
         AsyncImage(
@@ -347,14 +347,14 @@ fun AlbumSongItem(
                 .align(Alignment.CenterVertically)
         ) {
             Text(
-                text = songEntity.title ?: context.getString(R.string.unknown_song),
+                text = songEntity.title ?: stringResource(R.string.unknown_song),
                 style = SaltTheme.textStyles.main,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = if (isCurrentPlaying) SaltTheme.colors.highlight else SaltTheme.colors.text
             )
 
-            val artist = songEntity.artistName ?: context.getString(R.string.unknown_artist)
+            val artist = songEntity.artistName ?: stringResource(R.string.unknown_artist)
             Text(
                 text = artist,
                 style = SaltTheme.textStyles.sub,

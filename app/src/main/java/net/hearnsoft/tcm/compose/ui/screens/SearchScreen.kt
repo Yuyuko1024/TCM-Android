@@ -228,7 +228,6 @@ private fun SearchResultItem(
     result: SearchResult,
     onClick: () -> Unit
 ) {
-    val context = LocalContext.current
     val icon = when (result.type) {
         SearchResultType.LOCAL_MUSIC -> R.drawable.ic_nav_music
         else -> R.drawable.ic_explore
@@ -236,7 +235,7 @@ private fun SearchResultItem(
 
     val subtitle = when (result) {
         is LocalMusicSearchResult -> {
-            "${result.subtitle} • ${context.getString(R.string.match_label)}: ${result.matchedFields.joinToString(", ")}"
+            "${result.subtitle} • ${stringResource(R.string.match_label)}: ${result.matchedFields.joinToString(", ")}"
         }
         is NetworkContentSearchResult -> {
             "${result.subtitle} • ${result.source}"

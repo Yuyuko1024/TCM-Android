@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
@@ -35,10 +36,9 @@ fun PlaylistItem(
     onClick: () -> Unit = {},
     onRemoveClick: (MediaItem) -> Unit = { _ -> }
 ) {
-    val context = LocalContext.current
-    val title =  mediaItem.mediaMetadata.title.toString() ?: context.getString(R.string.unknown_song)
-    val artist = mediaItem.mediaMetadata.artist.toString() ?: context.getString(R.string.unknown_artist)
-    val album = mediaItem.mediaMetadata.albumTitle.toString() ?: context.getString(R.string.unknown_album)
+    val title =  mediaItem.mediaMetadata.title.toString() ?: stringResource(R.string.unknown_song)
+    val artist = mediaItem.mediaMetadata.artist.toString() ?: stringResource(R.string.unknown_artist)
+    val album = mediaItem.mediaMetadata.albumTitle.toString() ?: stringResource(R.string.unknown_album)
 
     // 比较是否是当前播放的歌曲
     val isCurrentPlaying = currentPlaying?.mediaId == mediaItem.mediaId && currentPlayingIndex == itemIndex

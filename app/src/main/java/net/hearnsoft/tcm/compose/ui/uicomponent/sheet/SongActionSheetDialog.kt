@@ -74,7 +74,6 @@ fun SongActionSheetDialog(
 fun SongActionHeader(
     songEntity: SongEntity
 ) {
-    val context = LocalContext.current
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 8.dp)
     ) {
@@ -100,15 +99,15 @@ fun SongActionHeader(
                 .align(Alignment.CenterVertically)
         ) {
             Text(
-                text = songEntity.title ?: context.getString(R.string.unknown_song),
+                text = songEntity.title ?: stringResource(R.string.unknown_song),
                 style = SaltTheme.textStyles.main,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = SaltTheme.colors.text
             )
 
-            val artist = songEntity.artistName ?: context.getString(R.string.unknown_artist)
-            val album = songEntity.albumName ?: context.getString(R.string.unknown_album)
+            val artist = songEntity.artistName ?: stringResource(R.string.unknown_artist)
+            val album = songEntity.albumName ?: stringResource(R.string.unknown_album)
 
             val subTitle = "$artist - $album"
             Text(
@@ -153,7 +152,7 @@ fun SongActionSheetContent(
                     onDismissRequest()
                 }
             },
-            text = stringResource(R.string.artist_label, songEntity.artistName ?: context.getString(R.string.unknown_artist)),
+            text = stringResource(R.string.artist_label, songEntity.artistName ?: stringResource(R.string.unknown_artist)),
             iconPainter = painterResource(R.drawable.ic_artist_24px),
             iconColor = SaltTheme.colors.highlight,
         )
@@ -164,7 +163,7 @@ fun SongActionSheetContent(
                     onDismissRequest()
                 }
             },
-            text = stringResource(R.string.album_label, songEntity.albumName ?: context.getString(R.string.unknown_album)),
+            text = stringResource(R.string.album_label, songEntity.albumName ?: stringResource(R.string.unknown_album)),
             iconPainter = painterResource(R.drawable.ic_album_24px),
             iconColor = SaltTheme.colors.highlight,
         )
