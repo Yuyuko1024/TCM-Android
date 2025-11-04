@@ -1,4 +1,8 @@
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import java.io.FileInputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.Properties
 
 plugins {
@@ -82,6 +86,39 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    applicationVariants.configureEach {
+        val variant = this
+        outputs.configureEach {
+            (this as? BaseVariantOutputImpl)?.let { output ->
+                val dateFormat = SimpleDateFormat("yyyyMMdd-HHmm", Locale.getDefault())
+                val buildTime = dateFormat.format(Date())
+
+                output.outputFileName = buildString {
+                    append("tcm")
+
+                    // 添加 flavor（如果有）
+                    if (variant.flavorName.isNotEmpty()) {
+                        append("-${variant.flavorName}")
+                    }
+
+                    // 添加构建类型
+                    append("-${variant.buildType.name}")
+
+                    // 添加版本信息
+                    append("-v${variant.versionName}")
+                    append("-${variant.versionCode}")
+
+                    // 添加构建时间（可选）
+                    if (variant.buildType.name != "release") {
+                        append("-${buildTime}")
+                    }
+
+                    append(".apk")
+                }
+            }
+        }
     }
 }
 
