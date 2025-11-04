@@ -54,7 +54,7 @@ import com.moriafly.salt.ui.dialog.YesNoDialog
 import net.hearnsoft.tcm.compose.R
 import net.hearnsoft.tcm.compose.constants.PlayerCoverVerticalPadding
 import net.hearnsoft.tcm.compose.constants.PlayerHorizontalPadding
-import net.hearnsoft.tcm.compose.ui.uicomponent.PlaylistItem
+import net.hearnsoft.tcm.compose.ui.uicomponent.listitem.PlaylistItem
 import net.hearnsoft.tcm.compose.ui.utils.LocalPlayerUIColor
 import net.hearnsoft.tcm.compose.ui.viewmodel.PlayerViewModel
 

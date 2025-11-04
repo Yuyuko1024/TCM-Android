@@ -27,8 +27,32 @@ interface SongDao {
     @Query("SELECT * FROM songs WHERE artist_id = :artistId ORDER BY title ASC")
     fun getSongsByArtist(artistId: Long): Flow<List<SongEntity>>
 
-    @Query("SELECT * FROM songs WHERE is_favorite = 1 ORDER BY title ASC")
+    /**
+     * 获取喜欢的歌曲,按喜欢时间倒序排列
+     */
+    @Query("SELECT * FROM songs WHERE is_favorite = 1 ORDER BY favorite_date DESC")
     fun getFavoriteSongs(): Flow<List<SongEntity>>
+
+    /**
+     * 更新收藏状态和时间
+     */
+    @Query("""
+        UPDATE songs 
+        SET is_favorite = :isFavorite, 
+            favorite_date = CASE WHEN :isFavorite = 1 THEN :timestamp ELSE NULL END 
+        WHERE media_store_id = :songId
+    """)
+    suspend fun updateFavoriteStatus(
+        songId: Long,
+        isFavorite: Boolean,
+        timestamp: Long = System.currentTimeMillis()
+    )
+
+    /**
+     * 获取最新喜欢的歌曲
+     */
+    @Query("SELECT * FROM songs WHERE is_favorite = 1 ORDER BY favorite_date DESC LIMIT 1")
+    suspend fun getLatestFavoriteSong(): SongEntity?
 
     @Query("SELECT * FROM songs WHERE album_id = :albumId ORDER BY COALESCE(disc_number, 999), COALESCE(track_number, 999), title ASC")
     fun getSongsByAlbumOrdered(albumId: Long): Flow<List<SongEntity>>

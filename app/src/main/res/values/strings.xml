@@ -21,6 +21,7 @@
     <string name="match_label">Match</string>
     
     <!-- Music Screen -->
+    <string name="music_type_playlist">Playlist</string>
     <string name="music_type_song">Songs</string>
     <string name="music_type_album">Albums</string>
     <string name="music_type_artist">Artists</string>
@@ -28,6 +29,11 @@
     <string name="feature_in_development">This feature is under development…</string>
     <string name="empty_music_list">No content</string>
     <string name="empty_music_description">Find \"Scan Media\" in the side menu to scan music files on your device</string>
+    <string name="playlist_favorite">My favorite</string>
+    <string name="playlist_default_description">No description yet</string>
+    <string name="playlist_name_not_defined">Untitled playlist</string>
+    <string name="playlist_empty">No songs in this playlist</string>
+    <string name="playlist_empty_description">Add songs to this playlist to enjoy music</string>
     
     <!-- Music Scan Screen -->
     <string name="scan_music">Scan Music</string>
@@ -59,6 +65,9 @@
     
     <!-- Song Actions -->
     <string name="add_to_next">Add to play next</string>
+    <string name="add_to_favorite">Add to favorite</string>
+    <string name="remove_from_favorite">Remove from favorite</string>
+    <string name="add_to_song_playlist">Add to song playlist…</string>
     <string name="artist_label">Artist: %s</string>
     <string name="album_label">Album: %s</string>
     <string name="edit_in_music_tag">Edit info in Music Tag App…</string>

@@ -27,7 +27,8 @@ import androidx.room.PrimaryKey
         Index(value = ["album_id"]),
         Index(value = ["artist_id"]),
         Index(value = ["title"]),
-        Index(value = ["media_store_id"], unique = true)
+        Index(value = ["media_store_id"], unique = true),
+        Index(value = ["favorite_date"])
     ]
 )
 data class SongEntity(
@@ -84,5 +85,8 @@ data class SongEntity(
     val lastPlayed: Long? = null,
 
     @ColumnInfo(name = "is_favorite")
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+
+    @ColumnInfo(name = "favorite_date")
+    val favoriteDate: Long? = null
 )

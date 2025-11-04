@@ -1,4 +1,4 @@
-package net.hearnsoft.tcm.compose.ui.uicomponent
+package net.hearnsoft.tcm.compose.ui.uicomponent.listitem
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

@@ -22,6 +22,7 @@
     <string name="match_label">匹配</string>
     
     <!-- Music Screen -->
+    <string name="music_type_playlist">歌单</string>
     <string name="music_type_song">歌曲</string>
     <string name="music_type_album">专辑</string>
     <string name="music_type_artist">艺术家</string>
@@ -29,6 +30,11 @@
     <string name="feature_in_development">该功能正在开发中…</string>
     <string name="empty_music_list">暂无内容</string>
     <string name="empty_music_description">在侧边菜单里找到 扫描媒体 来扫描设备中的音乐文件</string>
+    <string name="playlist_favorite">我喜欢的音乐</string>
+    <string name="playlist_default_description">暂时还没有描述</string>
+    <string name="playlist_name_not_defined">未命名歌单</string>
+    <string name="playlist_empty">这个歌单里什么都没有…</string>
+    <string name="playlist_empty_description">添加点歌曲到歌单里吧</string>
     
     <!-- Music Scan Screen -->
     <string name="scan_music">扫描音乐</string>
@@ -60,6 +66,9 @@
     
     <!-- Song Actions -->
     <string name="add_to_next">添加到下一首播放</string>
+    <string name="add_to_favorite">添加到我的喜欢</string>
+    <string name="remove_from_favorite">从我的喜欢移除</string>
+    <string name="add_to_song_playlist">添加到歌单…</string>
     <string name="artist_label">艺术家：%s</string>
     <string name="album_label">专辑：%s</string>
     <string name="edit_in_music_tag">在 音乐标签 App中编辑信息…</string>

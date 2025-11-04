@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -35,6 +36,7 @@ import net.hearnsoft.tcm.compose.R
 import net.hearnsoft.tcm.compose.data.database.entities.SongEntity
 import net.hearnsoft.tcm.compose.ui.screens.ScreenRoute
 import net.hearnsoft.tcm.compose.ui.viewmodel.PlayerViewModel
+import net.hearnsoft.tcm.compose.ui.viewmodel.PlaylistViewModel
 import net.hearnsoft.tcm.compose.utils.IntentUtils
 
 
@@ -129,6 +131,7 @@ fun SongActionHeader(
 @ExperimentalMaterial3Api
 fun SongActionSheetContent(
     playerViewModel: PlayerViewModel,
+    playlistViewModel: PlaylistViewModel = hiltViewModel(),
     songEntity: SongEntity,
     navController: NavController? = null,
     onDismissRequest: () -> Unit = {}
@@ -136,6 +139,19 @@ fun SongActionSheetContent(
     val context = LocalContext.current
 
     RoundedColumn {
+        val isInFavorite = songEntity.isFavorite
+        Item(
+            onClick = {
+                playerViewModel.updateFavoriteStatus(songEntity.mediaStoreId, !isInFavorite)
+                playerViewModel.reloadAllSongs()
+                onDismissRequest()
+            },
+            text = if (isInFavorite) stringResource(R.string.remove_from_favorite)
+                    else stringResource(R.string.add_to_favorite),
+            iconPainter = if (isInFavorite) painterResource(R.drawable.ic_favorite_border)
+                    else painterResource(R.drawable.ic_favorite),
+            iconColor = SaltTheme.colors.highlight,
+        )
         Item(
             onClick = {
                 playerViewModel.addToPlayNext(songEntity)

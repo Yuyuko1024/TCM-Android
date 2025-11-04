@@ -2,6 +2,7 @@ package net.hearnsoft.tcm.compose.ui.viewmodel
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -54,6 +55,11 @@ class PlayerViewModel @Inject constructor(
     // 给UI层使用的排序和过滤后的数据
     private val _allSongs = MutableStateFlow<List<SongEntity>>(emptyList())
     val allSongs: StateFlow<List<SongEntity>> = _allSongs.asStateFlow()
+
+    // === 播放列表相关 ===
+    // 喜欢的歌曲列表
+    private val _favoriteSongs = MutableStateFlow<List<SongEntity>>(emptyList())
+    val favoriteSongs: StateFlow<List<SongEntity>> = _favoriteSongs.asStateFlow()
 
     // 当前播放列表
     val currentPlaylist: StateFlow<List<MediaItem>> = playerController.currentPlaylist
@@ -129,6 +135,9 @@ class PlayerViewModel @Inject constructor(
 
         // 监听当前歌曲，并进行播放次数增加
         observeToIncrementPlayCount()
+
+        // 监听收藏状态变化
+        observeFavoriteStatusChange()
     }
 
     private fun observeSortingRuleChanges() {
@@ -253,6 +262,9 @@ class PlayerViewModel @Inject constructor(
                 _rawSongs.value = songs
                 Logger.debug(TAG, "加载了 ${songs.size} 首歌曲")
 
+                // 加载喜欢的歌曲
+                loadAllFavoriteSongs()
+
                 // 应用当前排序规则
                 applySongSort(songs, _currentSongSortingRule.value)
             } catch (e: Exception) {
@@ -277,6 +289,24 @@ class PlayerViewModel @Inject constructor(
                 applyAlbumSort(albums, _currentAlbumSortingRule.value)
             } catch (e: Exception) {
                 Logger.err(TAG, "加载专辑失败: ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * 加载所有喜欢的歌曲
+     */
+    fun loadAllFavoriteSongs() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.value = true
+            try {
+                val favoriteSongs = musicRepository.getFavoriteSongs().first()
+                _favoriteSongs.value = favoriteSongs
+                Logger.debug(TAG, "加载了 ${favoriteSongs.size} 首喜欢的歌曲")
+            } catch (e: Exception) {
+                Logger.err(TAG, "加载喜欢的歌曲失败: ${e.message}")
             } finally {
                 _isLoading.value = false
             }
@@ -600,6 +630,15 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
+    fun observeFavoriteStatusChange() {
+        viewModelScope.launch {
+            // 监听收藏状态变化，重新加载喜欢的歌曲列表
+            isFavorite.collectLatest {
+                loadAllFavoriteSongs()
+            }
+        }
+    }
+
     fun toggleCurrentSongFavorite() {
         viewModelScope.launch {
             val mediaItem = currentMediaItem.value
@@ -619,7 +658,11 @@ class PlayerViewModel @Inject constructor(
     fun updateFavoriteStatus(songId: Long, isFavorite: Boolean) {
         viewModelScope.launch {
             try {
-                musicRepository.updateFavoriteStatus(songId, isFavorite)
+                musicRepository.updateFavoriteStatus(
+                    songId,
+                    isFavorite,
+                    System.currentTimeMillis()
+                )
                 PlayerFavoriteBridge.update(isFavorite)
                 Logger.debug(TAG, "更新收藏状态: $songId -> $isFavorite")
             } catch (e: Exception) {

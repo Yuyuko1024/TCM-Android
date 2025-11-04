@@ -10,7 +10,11 @@ import kotlinx.coroutines.flow.first
 import net.hearnsoft.tcm.compose.data.database.MusicDatabase
 import net.hearnsoft.tcm.compose.data.database.entities.AlbumEntity
 import net.hearnsoft.tcm.compose.data.database.entities.ArtistEntity
+import net.hearnsoft.tcm.compose.data.database.entities.PlaylistEntity
+import net.hearnsoft.tcm.compose.data.database.entities.PlaylistSongCrossRef
+import net.hearnsoft.tcm.compose.data.database.entities.PlaylistWithSongs
 import net.hearnsoft.tcm.compose.data.database.entities.SongEntity
+import net.hearnsoft.tcm.compose.data.database.entities.SongWithPlaylists
 import net.hearnsoft.tcm.compose.utils.FilePathUtils
 import net.hearnsoft.tcm.compose.utils.LocalMusicScanner
 import net.hearnsoft.tcm.compose.utils.Logger
@@ -27,6 +31,7 @@ class LocalMusicRepository @Inject constructor(
     private val songDao = database.songDao()
     private val albumDao = database.albumDao()
     private val artistDao = database.artistDao()
+    private val playlistDao = database.playlistDao()
 
     // === 歌曲相关操作 ===
     override fun getAllSongs(): Flow<List<SongEntity>> = songDao.getAllSongs()
@@ -35,6 +40,8 @@ class LocalMusicRepository @Inject constructor(
     override fun getSongsByAlbum(albumId: Long): Flow<List<SongEntity>> = songDao.getSongsByAlbum(albumId)
     override fun getSongsByArtist(artistId: Long): Flow<List<SongEntity>> = songDao.getSongsByArtist(artistId)
     override fun getFavoriteSongs(): Flow<List<SongEntity>> = songDao.getFavoriteSongs()
+    override suspend fun updateFavoriteStatus(songId: Long, isFavorite: Boolean, timestamp: Long) =
+        songDao.updateFavoriteStatus(songId, isFavorite, timestamp)
     override fun getMostPlayedSongs(limit: Int): Flow<List<SongEntity>> = songDao.getMostPlayedSongs(limit)
     override fun getRecentlyPlayedSongs(limit: Int): Flow<List<SongEntity>> = songDao.getRecentlyPlayedSongs(limit)
 
@@ -70,6 +77,80 @@ class LocalMusicRepository @Inject constructor(
     override suspend fun updateArtist(artist: ArtistEntity) = artistDao.updateArtist(artist)
     override suspend fun deleteArtist(artist: ArtistEntity) = artistDao.deleteArtist(artist)
     override suspend fun deleteAllArtists() = artistDao.deleteAllArtists()
+
+    // === 歌单相关操作 ===
+    override fun getAllPlaylists(): Flow<List<PlaylistEntity>> = playlistDao.getAllPlaylists()
+    override suspend fun getPlaylistById(playlistId: Long): PlaylistEntity? = playlistDao.getPlaylistById(playlistId)
+    override suspend fun getPlaylistByName(playlistName: String): PlaylistEntity? = playlistDao.getPlaylistByName(playlistName)
+    override suspend fun insertPlaylist(playlist: PlaylistEntity): Long = playlistDao.insertPlaylist(playlist)
+    override suspend fun updatePlaylist(playlist: PlaylistEntity) = playlistDao.updatePlaylist(playlist)
+    override suspend fun deletePlaylist(playlist: PlaylistEntity) = playlistDao.deletePlaylist(playlist)
+    override suspend fun deleteAllPlaylists() = playlistDao.deleteAllPlaylists()
+    override suspend fun getPlaylistCount(): Int = playlistDao.getPlaylistCount()
+
+    // === 歌单与歌曲关联操作 ===
+    override fun getPlaylistWithSongs(playlistId: Long): Flow<PlaylistWithSongs?> =
+        playlistDao.getPlaylistWithSongs(playlistId)
+
+    override fun getSongsInPlaylist(playlistId: Long): Flow<List<SongEntity>> =
+        playlistDao.getSongsInPlaylist(playlistId)
+
+    override fun getFavoriteSongsInPlaylist(playlistId: Long): Flow<List<SongEntity>> =
+        playlistDao.getFavoriteSongsInPlaylist(playlistId)
+
+    override fun getSongWithPlaylists(songId: Long): Flow<SongWithPlaylists?> =
+        playlistDao.getSongWithPlaylists(songId)
+
+    override suspend fun addSongToPlaylist(playlistId: Long, songId: Long, position: Int) {
+        val crossRef = PlaylistSongCrossRef(
+            playlistId = playlistId,
+            songId = songId,
+            position = position
+        )
+        playlistDao.addSongToPlaylist(crossRef)
+
+        // 更新歌单的歌曲数量
+        val count = playlistDao.getSongCountInPlaylist(playlistId)
+        getPlaylistById(playlistId)?.let { playlist ->
+            updatePlaylist(playlist.copy(songCount = count))
+        }
+    }
+
+    override suspend fun removeSongFromPlaylist(playlistId: Long, songId: Long) {
+        playlistDao.removeSongFromPlaylist(playlistId, songId)
+
+        // 更新歌单的歌曲数量
+        val count = playlistDao.getSongCountInPlaylist(playlistId)
+        getPlaylistById(playlistId)?.let { playlist ->
+            updatePlaylist(playlist.copy(songCount = count))
+        }
+    }
+
+    override suspend fun isSongInPlaylist(playlistId: Long, songId: Long): Boolean =
+        playlistDao.isSongInPlaylist(playlistId, songId) > 0
+
+    override suspend fun getSongCountInPlaylist(playlistId: Long): Int =
+        playlistDao.getSongCountInPlaylist(playlistId)
+
+    override suspend fun updateSongPosition(playlistId: Long, songId: Long, position: Int) =
+        playlistDao.updateSongPosition(playlistId, songId, position)
+
+    override suspend fun clearPlaylist(playlistId: Long) {
+        playlistDao.clearPlaylist(playlistId)
+
+        // 更新歌单的歌曲数量为0
+        getPlaylistById(playlistId)?.let { playlist ->
+            updatePlaylist(playlist.copy(songCount = 0))
+        }
+    }
+
+    // === 歌单封面相关 ===
+    override suspend fun getFirstSongInPlaylist(playlistId: Long): SongEntity? =
+        playlistDao.getFirstSongInPlaylist(playlistId)
+
+    override suspend fun getLatestFavoriteSong(): SongEntity? =
+        songDao.getLatestFavoriteSong()
+
 
     // === 数据同步操作 ===
     override suspend fun scanAndUpdateLibrary(onProgress: ((String) -> Unit)?) {

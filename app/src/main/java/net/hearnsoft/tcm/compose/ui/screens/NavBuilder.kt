@@ -51,6 +51,7 @@ fun NavGraphBuilder.navigationBuilder(
             userViewModel = userViewModel
         )
     }
+    // 专辑页面
     composable(
         route = ScreenRoute.Album.route,
         arguments = listOf(
@@ -64,6 +65,21 @@ fun NavGraphBuilder.navigationBuilder(
             playerViewModel = playerViewModel
         )
     }
+    // 歌单详情页面
+    composable(
+        route = ScreenRoute.PlaylistDetail.route,
+        arguments = listOf(
+            navArgument("playlistId") { type = NavType.LongType }
+        )
+    ) { backStackEntry ->
+        val playlistId = backStackEntry.arguments?.getLong("playlistId") ?: 0L
+        PlaylistScreen(
+            playlistId = playlistId,
+            navController = navController,
+            playerViewModel = playerViewModel
+        )
+    }
+    // 设置页面
     composable(ScreenRoute.Settings.route) {
         SettingsScreen()
     }

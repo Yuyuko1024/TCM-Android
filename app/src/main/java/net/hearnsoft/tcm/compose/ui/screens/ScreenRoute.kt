@@ -30,6 +30,11 @@ sealed class ScreenRoute(open val route: String) {
         fun createRoute(username: String): String = "profile/$username"
     }
 
+    // 歌单详情页面
+    object PlaylistDetail : ScreenRoute("playlist/{playlistId}") {
+        fun createRoute(playlistId: Long): String = "playlist/$playlistId"
+    }
+
     companion object {
         val MainScreens = listOf(
             Explore,

@@ -67,7 +67,7 @@ fun AlbumScreen(
     albumId: Long,
     navController: NavController,
     albumViewModel: AlbumViewModel = hiltViewModel(),
-    playerViewModel: PlayerViewModel = hiltViewModel()
+    playerViewModel: PlayerViewModel
 ) {
     val context = LocalContext.current
 

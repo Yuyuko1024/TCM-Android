@@ -52,13 +52,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
+import com.moriafly.salt.ui.Button
 import com.moriafly.salt.ui.Icon
 import com.moriafly.salt.ui.SaltTheme
 import com.moriafly.salt.ui.Text
 import com.moriafly.salt.ui.UnstableSaltUiApi
+import com.moriafly.salt.ui.dialog.InputDialog
 import kotlinx.coroutines.launch
 import my.nanihadesuka.compose.LazyColumnScrollbar
 import my.nanihadesuka.compose.LazyVerticalGridScrollbar
@@ -66,13 +67,15 @@ import my.nanihadesuka.compose.ScrollbarSettings
 import net.hearnsoft.tcm.compose.R
 import net.hearnsoft.tcm.compose.data.database.entities.AlbumEntity
 import net.hearnsoft.tcm.compose.data.database.entities.SongEntity
-import net.hearnsoft.tcm.compose.ui.uicomponent.AlbumListItem
-import net.hearnsoft.tcm.compose.ui.uicomponent.MusicListItem
+import net.hearnsoft.tcm.compose.ui.uicomponent.listitem.AlbumListItem
+import net.hearnsoft.tcm.compose.ui.uicomponent.listitem.MusicListItem
+import net.hearnsoft.tcm.compose.ui.uicomponent.listitem.PlaylistListItem
 import net.hearnsoft.tcm.compose.ui.uicomponent.sheet.AlbumSortSheetDialog
 import net.hearnsoft.tcm.compose.ui.uicomponent.sheet.MusicSortSheetDialog
 import net.hearnsoft.tcm.compose.ui.uicomponent.sheet.SongActionSheetDialog
 import net.hearnsoft.tcm.compose.ui.utils.LocalPlayerAwareWindowInsets
 import net.hearnsoft.tcm.compose.ui.viewmodel.PlayerViewModel
+import net.hearnsoft.tcm.compose.ui.viewmodel.PlaylistViewModel
 
 @UnstableSaltUiApi
 @ExperimentalMaterial3Api
@@ -104,6 +107,7 @@ fun MusicScreen(
     // 选择的音乐类型
     var selectedType by rememberSaveable { mutableStateOf(MusicType.SONG) }
     val typeList = listOf(
+        MusicType.PLAYLIST,
         MusicType.SONG,
         MusicType.ALBUM,
         MusicType.ARTIST,
@@ -142,6 +146,7 @@ fun MusicScreen(
             SongActionSheetDialog(
                 onDismissRequest = {
                     showActionDialog = false
+                    selectedSong = null
                 },
                 playerViewModel = playerViewModel,
                 songEntity = it,
@@ -190,6 +195,17 @@ fun MusicScreen(
                         },
                         divider = { /* 不显示分隔线 */ },
                     ) {
+                        LeadingIconTab(
+                            selected = selectedType == MusicType.PLAYLIST,
+                            onClick = { selectedType = MusicType.PLAYLIST },
+                            icon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_favorite_border),
+                                    contentDescription = stringResource(R.string.music_type_playlist),
+                                )
+                            },
+                            text = {  }
+                        )
                         LeadingIconTab(
                             selected = selectedType == MusicType.SONG,
                             onClick = { selectedType = MusicType.SONG },
@@ -303,6 +319,16 @@ fun MusicScreen(
                         label = "contentTypeChange"
                     ) { type ->
                         when (type) {
+                            MusicType.PLAYLIST -> {
+                                PlaylistList(
+                                    navController = navController,
+                                    onActionClick = { songEntity ->
+                                        showActionDialog = true
+                                        selectedSong = songEntity
+                                    }
+                                )
+                            }
+
                             MusicType.SONG -> {
                                 MusicList(
                                     playerViewModel = playerViewModel,
@@ -377,6 +403,104 @@ fun EmptyMusicList() {
         }
     }
 }
+
+@UnstableSaltUiApi
+@UnstableApi
+@ExperimentalFoundationApi
+@ExperimentalMaterial3Api
+@Composable
+fun PlaylistList(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    playlistViewModel: PlaylistViewModel = hiltViewModel(),
+    onActionClick: (SongEntity) -> Unit = { }
+) {
+    val favoriteArtworkUri by playlistViewModel.favoriteCoverUri.collectAsState()
+    val playlistsWithCovers by playlistViewModel.playlistsWithCovers.collectAsState()
+
+    var showCreatePlaylistDialog by remember { mutableStateOf(false) }
+    var newPlaylistName by remember { mutableStateOf("") }
+
+    if (showCreatePlaylistDialog) {
+        InputDialog(
+            title = "歌单名称",
+            hint = "输入歌单名称",
+            text = newPlaylistName,
+            onChange = {
+                newPlaylistName = it
+            },
+            onConfirm = {
+                val playlistId = playlistViewModel.createPlaylist(newPlaylistName)
+                showCreatePlaylistDialog = false
+                navController.navigate(
+                    ScreenRoute.PlaylistDetail.createRoute(playlistId)
+                )
+            },
+            onDismissRequest = {
+                showCreatePlaylistDialog = false
+            }
+        )
+    }
+
+    Box(Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            // 喜欢的歌曲列表
+            item {
+                PlaylistListItem(
+                    playlistName = stringResource(R.string.playlist_favorite),
+                    artworkUri = favoriteArtworkUri,
+                    isFavoritePlaylist = true,
+                    onClick = {
+                        navController.navigate(
+                            // 别问为什么是0L，我特意留着这个ID给喜欢的歌单用的
+                            ScreenRoute.PlaylistDetail.createRoute(0L)
+                        )
+                    },
+                    onActionClick = {
+
+                    }
+                )
+            }
+
+            // 后续实现自定义歌单列表
+            items(
+                items = playlistsWithCovers,
+                key = { it.playlist.playlistId }
+            ) { playlistWithCover ->
+                PlaylistListItem(
+                    playlistName = playlistWithCover.playlist.playlistName,
+                    artworkUri = playlistWithCover.coverArtworkUri,
+                    songCount = playlistWithCover.playlist.songCount,
+                    onClick = {
+                        navController.navigate(
+                            ScreenRoute.PlaylistDetail.createRoute(playlistWithCover.playlist.playlistId)
+                        )
+                    },
+                    onActionClick = {}
+                )
+            }
+        }
+        SmallFloatingActionButton(
+            onClick = {
+                showCreatePlaylistDialog = true
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            containerColor = SaltTheme.colors.subBackground,
+            contentColor = SaltTheme.colors.highlight
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_add_24px),
+                contentDescription = "创建新歌单",
+            )
+        }
+    }
+}
+
 
 @UnstableSaltUiApi
 @UnstableApi
@@ -532,6 +656,7 @@ fun AlbumList(
 }
 
 private enum class MusicType() {
+    PLAYLIST(),
     SONG(),
     ALBUM(),
     ARTIST(),
