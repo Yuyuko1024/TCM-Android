@@ -71,7 +71,6 @@ fun PlaylistScreen(
 
     // === 基础状态 ===
     val isConnected by playerViewModel.isConnected.collectAsState()
-    val isLoading by playlistViewModel.isLoading.collectAsState()
 
     // === 数据源状态 ===
     val favoriteSongs by playerViewModel.favoriteSongs.collectAsState()
@@ -149,7 +148,7 @@ fun PlaylistScreen(
                     coverList = songs.mapNotNull { it.artworkUri },
                     onPlayAllClick = {
                         if (isConnected) {
-                            if (songs.isNotEmpty() && !isLoading) {
+                            if (songs.isNotEmpty()) {
                                 playerViewModel.setAndPlayPlaylist(
                                     songs = songs,
                                     startIndex = 0
