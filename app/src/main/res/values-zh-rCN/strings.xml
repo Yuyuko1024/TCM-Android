@@ -35,6 +35,10 @@
     <string name="playlist_name_not_defined">未命名歌单</string>
     <string name="playlist_empty">这个歌单里什么都没有…</string>
     <string name="playlist_empty_description">添加点歌曲到歌单里吧</string>
+    <string name="playlist_action_edit_title">编辑标题</string>
+    <string name="playlist_action_edit_description">编辑描述</string>
+    <string name="playlist_action_delete">删除歌单</string>
+    <string name="playlist_action_new">新建歌单</string>
     
     <!-- Music Scan Screen -->
     <string name="scan_music">扫描音乐</string>
@@ -207,4 +211,6 @@
     <string name="passwords_not_empty_or_not_match_toast">密码不可为空或密码不正确</string>
     <string name="user_not_empty_toast">用户名不可为空</string>
     <string name="player_not_connected">播放器服务未能连接，请重启App</string>
+    <string name="new_playlist_dialog_title">歌单名称</string>
+    <string name="new_playlist_dialog_hint">输入歌单名称</string>
 </resources>

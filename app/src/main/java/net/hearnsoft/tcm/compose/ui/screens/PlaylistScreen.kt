@@ -2,13 +2,16 @@ package net.hearnsoft.tcm.compose.ui.screens
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -44,6 +48,7 @@ import com.moriafly.salt.ui.Text
 import com.moriafly.salt.ui.UnstableSaltUiApi
 import net.hearnsoft.tcm.compose.R
 import net.hearnsoft.tcm.compose.data.database.entities.SongEntity
+import net.hearnsoft.tcm.compose.ui.uicomponent.TiltedPhotoWall
 import net.hearnsoft.tcm.compose.ui.uicomponent.listitem.MusicListItem
 import net.hearnsoft.tcm.compose.ui.uicomponent.sheet.SongActionSheetDialog
 import net.hearnsoft.tcm.compose.ui.viewmodel.PlayerViewModel
@@ -132,7 +137,7 @@ fun PlaylistScreen(
     // === UI 渲染 ===
     Box(modifier.fillMaxSize()) {
         LazyColumn(
-            modifier = modifier.fillMaxSize().padding(horizontal = 8.dp),
+            modifier = modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             item {
@@ -141,11 +146,22 @@ fun PlaylistScreen(
                     playlistDescription = playlistDescription,
                     songCount = songs.size,
                     artworkUri = songs.firstOrNull()?.artworkUri,
+                    coverList = songs.mapNotNull { it.artworkUri },
                     onPlayAllClick = {
-                        playerViewModel.setAndPlayPlaylist(
-                            songs = songs,
-                            startIndex = 0
-                        )
+                        if (isConnected) {
+                            if (songs.isNotEmpty() && !isLoading) {
+                                playerViewModel.setAndPlayPlaylist(
+                                    songs = songs,
+                                    startIndex = 0
+                                )
+                            }
+                        } else {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.player_not_connected),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 )
             }
@@ -153,20 +169,30 @@ fun PlaylistScreen(
                 items = songs,
                 key = { it.songId }
             ) { song ->
-                MusicListItem(
-                    songEntity = song,
-                    currentPlaying = currentPlaying,
-                    onClick = {
-                        playerViewModel.setAndPlayPlaylist(
-                            songs = songs,
-                            startIndex = songs.indexOfFirst { it.songId == song.songId }
-                        )
-                    },
-                    onActionClick = {
-                        showActionDialog = true
-                        selectedSong = song
-                    }
-                )
+                Box(Modifier.padding(horizontal = 8.dp)) {
+                    MusicListItem(
+                        songEntity = song,
+                        currentPlaying = currentPlaying,
+                        onClick = {
+                            if (isConnected) {
+                                playerViewModel.setAndPlayPlaylist(
+                                    songs = songs,
+                                    startIndex = songs.indexOfFirst { it.songId == song.songId }
+                                )
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.player_not_connected),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        },
+                        onActionClick = {
+                            showActionDialog = true
+                            selectedSong = song
+                        }
+                    )
+                }
             }
         }
     }
@@ -176,70 +202,93 @@ fun PlaylistScreen(
 @Composable
 fun PlaylistHeader(
     modifier: Modifier = Modifier,
+    coverList: List<Uri?> = emptyList(),
     artworkUri: Uri? = null,
     playlistTitle: String,
     playlistDescription: String?,
     songCount: Int,
     onPlayAllClick: () -> Unit = {}
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 16.dp)
+    Box(
+        Modifier.fillMaxWidth()
     ) {
-
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(artworkUri)
-                .crossfade(true)
-                .placeholder(R.drawable.ic_album_24px)
-                .build(),
-            contentDescription = playlistDescription,
-            contentScale = ContentScale.Crop,
+        TiltedPhotoWall(
+            imageUris = coverList,
             modifier = Modifier
-                .size(120.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .align(Alignment.CenterVertically)
+                .fillMaxWidth()
+                .matchParentSize()
         )
-
-        Column(
+        Box(
             modifier = Modifier
-                .padding(start = 16.dp)
-                .align(Alignment.CenterVertically)
+                .fillMaxWidth()
+                .matchParentSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            SaltTheme.colors.background.copy(alpha = 0.3f),
+                            SaltTheme.colors.background
+                        )
+                    )
+                )
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 16.dp)
         ) {
-            Text(
-                text = playlistTitle,
-                style = SaltTheme.textStyles.main,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = SaltTheme.colors.text,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                text = playlistDescription?: stringResource(R.string.playlist_default_description),
-                style = SaltTheme.textStyles.sub,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = SaltTheme.colors.subText,
-                modifier = Modifier.padding(bottom = 2.dp)
-            )
-            Text(
-                text = stringResource(R.string.song_count, songCount),
-                style = SaltTheme.textStyles.sub,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = SaltTheme.colors.subText,
-                modifier = Modifier.padding(bottom = 8.dp)
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(artworkUri)
+                    .crossfade(true)
+                    .placeholder(R.drawable.ic_album_24px)
+                    .build(),
+                contentDescription = playlistDescription,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .align(Alignment.CenterVertically)
             )
 
-            Button(
-                text = stringResource(R.string.play_all),
-                onClick = {
-                    onPlayAllClick()
-                },
+            Column(
                 modifier = Modifier
-                    .align(Alignment.Start)
-            )
+                    .padding(start = 16.dp)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Text(
+                    text = playlistTitle,
+                    style = SaltTheme.textStyles.main,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = SaltTheme.colors.text,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = playlistDescription?: stringResource(R.string.playlist_default_description),
+                    style = SaltTheme.textStyles.sub,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = SaltTheme.colors.subText,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+                Text(
+                    text = stringResource(R.string.song_count, songCount),
+                    style = SaltTheme.textStyles.sub,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = SaltTheme.colors.subText,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                Button(
+                    text = stringResource(R.string.play_all),
+                    onClick = {
+                        onPlayAllClick()
+                    },
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                )
+            }
         }
     }
 }

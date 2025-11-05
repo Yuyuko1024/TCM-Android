@@ -42,13 +42,17 @@ class PlaylistViewModel @Inject constructor(
     private val _favoriteCoverUri = MutableStateFlow<Uri?>(null)
     val favoriteCoverUri: StateFlow<Uri?> = _favoriteCoverUri.asStateFlow()
 
+    // === 喜欢的歌曲数量 ===
+    private val _favoriteSongCount = MutableStateFlow(0)
+    val favoriteSongCount: StateFlow<Int> = _favoriteSongCount.asStateFlow()
+
     // === UI 状态 ===
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init {
         loadAllPlaylists()
-        observeFavoriteCover()
+        observeFavorite()
     }
 
     // === 歌单基本操作 ===
@@ -98,14 +102,15 @@ class PlaylistViewModel @Inject constructor(
     }
 
     /**
-     * 持续观察喜欢的歌曲封面变化
+     * 持续观察喜欢的歌曲变化
      */
-    private fun observeFavoriteCover() {
+    private fun observeFavorite() {
         viewModelScope.launch {
             try {
                 musicRepository.getFavoriteSongs().collectLatest { favoriteSongs ->
                     // 获取最新添加的喜欢歌曲的封面
                     _favoriteCoverUri.value = favoriteSongs.firstOrNull()?.artworkUri
+                    _favoriteSongCount.value = favoriteSongs.size
                     Logger.debug(TAG, "更新喜欢的歌曲封面: ${_favoriteCoverUri.value}")
                 }
             } catch (e: Exception) {

@@ -66,12 +66,14 @@ import my.nanihadesuka.compose.LazyVerticalGridScrollbar
 import my.nanihadesuka.compose.ScrollbarSettings
 import net.hearnsoft.tcm.compose.R
 import net.hearnsoft.tcm.compose.data.database.entities.AlbumEntity
+import net.hearnsoft.tcm.compose.data.database.entities.PlaylistEntity
 import net.hearnsoft.tcm.compose.data.database.entities.SongEntity
 import net.hearnsoft.tcm.compose.ui.uicomponent.listitem.AlbumListItem
 import net.hearnsoft.tcm.compose.ui.uicomponent.listitem.MusicListItem
 import net.hearnsoft.tcm.compose.ui.uicomponent.listitem.PlaylistListItem
 import net.hearnsoft.tcm.compose.ui.uicomponent.sheet.AlbumSortSheetDialog
 import net.hearnsoft.tcm.compose.ui.uicomponent.sheet.MusicSortSheetDialog
+import net.hearnsoft.tcm.compose.ui.uicomponent.sheet.PlaylistActionSheet
 import net.hearnsoft.tcm.compose.ui.uicomponent.sheet.SongActionSheetDialog
 import net.hearnsoft.tcm.compose.ui.utils.LocalPlayerAwareWindowInsets
 import net.hearnsoft.tcm.compose.ui.viewmodel.PlayerViewModel
@@ -320,13 +322,7 @@ fun MusicScreen(
                     ) { type ->
                         when (type) {
                             MusicType.PLAYLIST -> {
-                                PlaylistList(
-                                    navController = navController,
-                                    onActionClick = { songEntity ->
-                                        showActionDialog = true
-                                        selectedSong = songEntity
-                                    }
-                                )
+                                PlaylistList(navController = navController)
                             }
 
                             MusicType.SONG -> {
@@ -413,18 +409,21 @@ fun PlaylistList(
     modifier: Modifier = Modifier,
     navController: NavController,
     playlistViewModel: PlaylistViewModel = hiltViewModel(),
-    onActionClick: (SongEntity) -> Unit = { }
 ) {
     val favoriteArtworkUri by playlistViewModel.favoriteCoverUri.collectAsState()
+    val favoriteSongCount by playlistViewModel.favoriteSongCount.collectAsState()
     val playlistsWithCovers by playlistViewModel.playlistsWithCovers.collectAsState()
 
     var showCreatePlaylistDialog by remember { mutableStateOf(false) }
     var newPlaylistName by remember { mutableStateOf("") }
 
+    var showActionSheet by remember { mutableStateOf(false) }
+    var selectedPlaylist by remember { mutableStateOf(playlistsWithCovers.firstOrNull()?.playlist) }
+
     if (showCreatePlaylistDialog) {
         InputDialog(
-            title = "歌单名称",
-            hint = "输入歌单名称",
+            title = stringResource(R.string.new_playlist_dialog_title),
+            hint = stringResource(R.string.new_playlist_dialog_hint),
             text = newPlaylistName,
             onChange = {
                 newPlaylistName = it
@@ -442,6 +441,19 @@ fun PlaylistList(
         )
     }
 
+    if (showActionSheet) {
+        selectedPlaylist?.let { playlist ->
+            PlaylistActionSheet(
+                playlist = playlist,
+                playlistViewModel = playlistViewModel,
+                onDismissRequest = {
+                    showActionSheet = false
+                    selectedPlaylist = null
+                }
+            )
+        }
+    }
+
     Box(Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -453,14 +465,12 @@ fun PlaylistList(
                     playlistName = stringResource(R.string.playlist_favorite),
                     artworkUri = favoriteArtworkUri,
                     isFavoritePlaylist = true,
+                    songCount = favoriteSongCount,
                     onClick = {
                         navController.navigate(
                             // 别问为什么是0L，我特意留着这个ID给喜欢的歌单用的
                             ScreenRoute.PlaylistDetail.createRoute(0L)
                         )
-                    },
-                    onActionClick = {
-
                     }
                 )
             }
@@ -479,7 +489,10 @@ fun PlaylistList(
                             ScreenRoute.PlaylistDetail.createRoute(playlistWithCover.playlist.playlistId)
                         )
                     },
-                    onActionClick = {}
+                    onActionClick = {
+                        showActionSheet = true
+                        selectedPlaylist = playlistWithCover.playlist
+                    }
                 )
             }
         }

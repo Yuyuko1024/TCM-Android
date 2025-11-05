@@ -67,10 +67,13 @@ fun PlaylistListItem(
                 contentScale = ContentScale.Crop
             )
             if (isFavoritePlaylist) {
-                Box(Modifier.matchParentSize().background(Color.DarkGray.copy(alpha = 0.5f)))
+                Box(Modifier.matchParentSize()
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(Color.DarkGray.copy(alpha = 0.4f)))
                 Icon(
                     painter = painterResource(R.drawable.ic_favorite),
                     contentDescription = "Favorite Playlist",
+                    tint = Color.White,
                     modifier = Modifier
                         .align(Alignment.Center)
                         .padding(4.dp)
@@ -101,16 +104,18 @@ fun PlaylistListItem(
             )
         }
 
-        IconButton(
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .padding(8.dp),
-            onClick = { onActionClick() }
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_more_vert_24px),
-                contentDescription = "More Options",
-            )
+        if (isFavoritePlaylist.not()) {
+            IconButton(
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(8.dp),
+                onClick = { onActionClick() }
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_more_vert_24px),
+                    contentDescription = "More Options",
+                )
+            }
         }
     }
 }

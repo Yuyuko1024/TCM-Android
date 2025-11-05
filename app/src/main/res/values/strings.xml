@@ -34,6 +34,10 @@
     <string name="playlist_name_not_defined">Untitled playlist</string>
     <string name="playlist_empty">No songs in this playlist</string>
     <string name="playlist_empty_description">Add songs to this playlist to enjoy music</string>
+    <string name="playlist_action_edit_title">Edit title</string>
+    <string name="playlist_action_edit_description">Edit description</string>
+    <string name="playlist_action_delete">Delete playlist</string>
+    <string name="playlist_action_new">New playlist</string>
     
     <!-- Music Scan Screen -->
     <string name="scan_music">Scan Music</string>
@@ -206,4 +210,6 @@
     <string name="passwords_not_empty_or_not_match_toast">Password can\'t be empty or password not match</string>
     <string name="user_not_empty_toast">Username can\'t be empty</string>
     <string name="player_not_connected">Player service is not connected, please restart app.</string>
+    <string name="new_playlist_dialog_title">Playlist name</string>
+    <string name="new_playlist_dialog_hint">Enter new playlist name...</string>
 </resources>

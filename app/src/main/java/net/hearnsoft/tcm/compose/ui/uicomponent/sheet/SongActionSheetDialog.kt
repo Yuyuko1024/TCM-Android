@@ -11,6 +11,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +40,7 @@ import com.moriafly.salt.ui.UnstableSaltUiApi
 import net.hearnsoft.tcm.compose.R
 import net.hearnsoft.tcm.compose.data.database.entities.SongEntity
 import net.hearnsoft.tcm.compose.ui.screens.ScreenRoute
+import net.hearnsoft.tcm.compose.ui.uicomponent.AddToPlaylistDialog
 import net.hearnsoft.tcm.compose.ui.viewmodel.PlayerViewModel
 import net.hearnsoft.tcm.compose.ui.viewmodel.PlaylistViewModel
 import net.hearnsoft.tcm.compose.utils.IntentUtils
@@ -131,12 +137,22 @@ fun SongActionHeader(
 @ExperimentalMaterial3Api
 fun SongActionSheetContent(
     playerViewModel: PlayerViewModel,
-    playlistViewModel: PlaylistViewModel = hiltViewModel(),
     songEntity: SongEntity,
     navController: NavController? = null,
     onDismissRequest: () -> Unit = {}
 ) {
     val context = LocalContext.current
+
+    var showAddToPlaylistDialog by remember { mutableStateOf(false) }
+    if (showAddToPlaylistDialog) {
+        AddToPlaylistDialog(
+            selectedSongEntity = songEntity,
+            onDismissRequest = {
+                showAddToPlaylistDialog = false
+                onDismissRequest()
+            }
+        )
+    }
 
     RoundedColumn {
         val isInFavorite = songEntity.isFavorite
@@ -150,6 +166,14 @@ fun SongActionSheetContent(
                     else stringResource(R.string.add_to_favorite),
             iconPainter = if (isInFavorite) painterResource(R.drawable.ic_favorite_border)
                     else painterResource(R.drawable.ic_favorite),
+            iconColor = SaltTheme.colors.highlight,
+        )
+        Item(
+            onClick = {
+                showAddToPlaylistDialog = true
+            },
+            text = stringResource(R.string.add_to_song_playlist),
+            iconPainter = painterResource(R.drawable.ic_add_24px),
             iconColor = SaltTheme.colors.highlight,
         )
         Item(
