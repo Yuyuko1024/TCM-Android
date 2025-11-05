@@ -482,6 +482,21 @@ class PlayerViewModel @Inject constructor(
     }
 
     /**
+     * 从数据库中删除指定歌曲
+     * @param songEntity 要删除的媒体项
+     */
+    fun removeSongFromDatabase(songEntity: SongEntity) {
+        viewModelScope.launch {
+            try {
+                musicRepository.deleteSong(songEntity)
+                Logger.debug(TAG, "从数据库删除歌曲: ${songEntity.title}")
+            } catch (e: Exception) {
+                Logger.err(TAG, "删除歌曲失败: ${e.message}")
+            }
+        }
+    }
+
+    /**
      * 从播放列表移除指定歌曲
      */
     fun removeFromPlaylist(mediaItem: MediaItem) {

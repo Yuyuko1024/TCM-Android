@@ -76,6 +76,10 @@
     <string name="album_label">Album: %s</string>
     <string name="edit_in_music_tag">Edit info in Music Tag App…</string>
     <string name="music_tag_not_found">Music tag app not found</string>
+    <string name="song_action_remove_from_db">Remove</string>
+    <string name="song_action_delete_file">Delete file</string>
+    <string name="delete_song_success">Delete song success</string>
+    <string name="delete_song_failed">Delete song failed</string>
     
     <!-- Sort Dialogs -->
     <string name="music_sort_rule">Music Sort Rule</string>
@@ -212,4 +216,8 @@
     <string name="player_not_connected">Player service is not connected, please restart app.</string>
     <string name="new_playlist_dialog_title">Playlist name</string>
     <string name="new_playlist_dialog_hint">Enter new playlist name...</string>
+    <string name="remove_song_confirm_title">Remove this song?</string>
+    <string name="remove_song_confirm_content">This will only remove this song from the App, but not delete your file</string>
+    <string name="delete_song_confirm_title">Delete this song?</string>
+    <string name="delete_song_confirm_content">This will remove this song from the App and delete your files along with it</string>
 </resources>

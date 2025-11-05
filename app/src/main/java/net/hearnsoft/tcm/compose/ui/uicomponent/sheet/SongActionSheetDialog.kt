@@ -1,6 +1,15 @@
 package net.hearnsoft.tcm.compose.ui.uicomponent.sheet
 
+import android.app.Activity
+import android.app.PendingIntent
+import android.content.Context
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +46,7 @@ import com.moriafly.salt.ui.RoundedColumn
 import com.moriafly.salt.ui.SaltTheme
 import com.moriafly.salt.ui.Text
 import com.moriafly.salt.ui.UnstableSaltUiApi
+import com.moriafly.salt.ui.dialog.YesNoDialog
 import net.hearnsoft.tcm.compose.R
 import net.hearnsoft.tcm.compose.data.database.entities.SongEntity
 import net.hearnsoft.tcm.compose.ui.screens.ScreenRoute
@@ -143,12 +153,57 @@ fun SongActionSheetContent(
 ) {
     val context = LocalContext.current
 
+    val deleteFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            Toast.makeText(context, context.getString(R.string.delete_song_success), Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, context.getString(R.string.delete_song_failed), Toast.LENGTH_SHORT).show()
+        }
+    }
+
     var showAddToPlaylistDialog by remember { mutableStateOf(false) }
     if (showAddToPlaylistDialog) {
         AddToPlaylistDialog(
             selectedSongEntity = songEntity,
             onDismissRequest = {
                 showAddToPlaylistDialog = false
+                onDismissRequest()
+            }
+        )
+    }
+
+    var showRemoveSongConfirmDialog by remember { mutableStateOf(false) }
+    if (showRemoveSongConfirmDialog) {
+        YesNoDialog(
+            title = stringResource(R.string.remove_song_confirm_title),
+            content = stringResource(R.string.remove_song_confirm_content),
+            onConfirm = {
+                playerViewModel.removeSongFromDatabase(songEntity)
+                playerViewModel.reloadAllSongs()
+                onDismissRequest()
+            },
+            onDismissRequest = {
+                showRemoveSongConfirmDialog = false
+                onDismissRequest()
+            }
+        )
+    }
+
+    var showDeleteSongFileConfirmDialog by remember { mutableStateOf(false) }
+    if (showDeleteSongFileConfirmDialog) {
+        YesNoDialog(
+            title = stringResource(R.string.delete_song_confirm_title),
+            content = stringResource(R.string.delete_song_confirm_content),
+            onConfirm = {
+                playerViewModel.removeSongFromDatabase(songEntity)
+                deleteSongFile(songEntity.contentUri, context, deleteFileLauncher)
+                playerViewModel.reloadAllSongs()
+                onDismissRequest()
+            },
+            onDismissRequest = {
+                showDeleteSongFileConfirmDialog = false
                 onDismissRequest()
             }
         )
@@ -219,12 +274,42 @@ fun SongActionSheetContent(
             iconColor = SaltTheme.colors.highlight,
         )
         Item(
-            onClick = {},
-            text = "aa"
+            onClick = {
+                showRemoveSongConfirmDialog = true
+            },
+            text = stringResource(R.string.song_action_remove_from_db),
+            iconPainter = painterResource(R.drawable.ic_close_24px),
+            iconColor = SaltTheme.colors.highlight,
         )
         Item(
-            onClick = {},
-            text = "aa"
+            onClick = {
+                showDeleteSongFileConfirmDialog = true
+            },
+            text = stringResource(R.string.song_action_delete_file),
+            iconPainter = painterResource(R.drawable.ic_delete_24px),
+            iconColor = SaltTheme.colors.highlight,
         )
+    }
+}
+
+private fun deleteSongFile(
+    uri: Uri,
+    context: Context,
+    deleteFileLauncher: androidx.activity.result.ActivityResultLauncher<IntentSenderRequest>? = null
+) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        val deleteIntent: PendingIntent = MediaStore.createDeleteRequest(
+            context.contentResolver,
+            listOf(uri)
+        )
+        val intentSenderRequest = IntentSenderRequest.Builder(deleteIntent.intentSender).build()
+        deleteFileLauncher?.launch(intentSenderRequest)
+    } else {
+        val result = context.contentResolver.delete(uri, null, null)
+        if (result > 0) {
+            Toast.makeText(context, context.getString(R.string.delete_song_success), Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, context.getString(R.string.delete_song_failed), Toast.LENGTH_SHORT).show()
+        }
     }
 }

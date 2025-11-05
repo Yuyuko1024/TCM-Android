@@ -77,6 +77,14 @@
     <string name="album_label">专辑：%s</string>
     <string name="edit_in_music_tag">在 音乐标签 App中编辑信息…</string>
     <string name="music_tag_not_found">未找到音乐标签应用</string>
+    <string name="song_action_remove_from_db">移除</string>
+    <string name="song_action_delete_file">删除文件</string>
+    <string name="remove_song_confirm_title">确认从数据库中移除歌曲？</string>
+    <string name="remove_song_confirm_content">该操作仅会将歌曲从应用数据库中移除，歌曲文件不会被删除。</string>
+    <string name="delete_song_confirm_title">确认删除歌曲文件？</string>
+    <string name="delete_song_confirm_content">该操作会将歌曲从应用数据库中移除，且同时删除歌曲文件。</string>
+    <string name="delete_song_success">删除歌曲成功</string>
+    <string name="delete_song_failed">删除歌曲失败</string>
     
     <!-- Sort Dialogs -->
     <string name="music_sort_rule">音乐排序规则</string>
