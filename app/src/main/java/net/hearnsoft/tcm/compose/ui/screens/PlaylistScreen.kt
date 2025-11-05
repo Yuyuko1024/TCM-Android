@@ -209,28 +209,30 @@ fun PlaylistHeader(
     songCount: Int,
     onPlayAllClick: () -> Unit = {}
 ) {
-    Box(
-        Modifier.fillMaxWidth()
-    ) {
-        TiltedPhotoWall(
-            imageUris = coverList,
-            modifier = Modifier
-                .fillMaxWidth()
-                .matchParentSize()
-        )
+    Column(Modifier.fillMaxWidth()) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .matchParentSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            SaltTheme.colors.background.copy(alpha = 0.3f),
-                            SaltTheme.colors.background
+            Modifier.fillMaxWidth().height(200.dp)
+        ) {
+            TiltedPhotoWall(
+                imageUris = coverList,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .matchParentSize()
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .matchParentSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                SaltTheme.colors.background.copy(alpha = 0.2f),
+                                SaltTheme.colors.background
+                            )
                         )
                     )
-                )
-        )
+            )
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
