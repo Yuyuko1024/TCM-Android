@@ -110,10 +110,8 @@ android {
                     append("-v${variant.versionName}")
                     append("-${variant.versionCode}")
 
-                    // 添加构建时间（可选）
-                    if (variant.buildType.name != "release") {
-                        append("-${buildTime}")
-                    }
+                    // 添加构建时间
+                    append("-${buildTime}")
 
                     append(".apk")
                 }
