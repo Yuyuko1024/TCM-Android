@@ -184,6 +184,9 @@
     <string name="title_search">搜索</string>
     <string name="title_login">登录</string>
     <string name="title_register">注册</string>
+    <string name="title_user_profile">用户资料</string>
+    <string name="title_edit_profile">编辑资料</string>
+    <string name="title_playlist">歌单</string>
     
     <!-- Drawer menu -->
     <string name="drawer_home">首页</string>

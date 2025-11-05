@@ -172,6 +172,8 @@ fun AppRootView(
         // 根据当前路由设置标题
         val title = when {
             currentRoute?.startsWith("album/") == true -> stringResource(R.string.title_album)
+            currentRoute?.startsWith("playlist/") == true -> stringResource(R.string.title_playlist)
+            currentRoute?.startsWith("profile/") == true -> stringResource(R.string.title_user_profile)
             currentRoute == ScreenRoute.Explore.route -> stringResource(R.string.title_explore)
             currentRoute == ScreenRoute.Library.route -> stringResource(R.string.title_library)
             currentRoute == ScreenRoute.Statistics.route -> stringResource(R.string.title_statistics)
@@ -182,6 +184,7 @@ fun AppRootView(
             currentRoute == ScreenRoute.SearchPage.route -> stringResource(R.string.title_search)
             currentRoute == ScreenRoute.LoginPage.route -> stringResource(R.string.title_login)
             currentRoute == ScreenRoute.RegisterPage.route -> stringResource(R.string.title_register)
+            currentRoute == ScreenRoute.EditProfile.route -> stringResource(R.string.title_edit_profile)
             else -> stringResource(R.string.app_name)
         }
 
