@@ -133,10 +133,7 @@ fun LyricsPager(
             if (currentPlaying != null) {
                 LyricsNowPlayingHeader(
                     mediaItem = currentPlaying,
-                    color = uiColor,
-                    onClick = {
-                        // do nothing
-                    }
+                    color = uiColor
                 )
             }
 
@@ -207,15 +204,11 @@ private fun NoLyricsPlaceholder(
 @Composable
 private fun LyricsNowPlayingHeader(
     mediaItem: MediaItem?,
-    color: Color,
-    onClick: () -> Unit = { }
+    color: Color
 ) {
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
-            .clickable(onClick = {
-                onClick()
-            })
             .fillMaxWidth()
             .padding(horizontal = 6.dp, vertical = 8.dp)
     ) {
