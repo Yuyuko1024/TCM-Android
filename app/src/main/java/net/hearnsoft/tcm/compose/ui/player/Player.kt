@@ -5,6 +5,9 @@ import android.app.Activity
 import android.view.Window
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -39,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -53,6 +57,21 @@ import com.moriafly.salt.ui.Surface
 import com.moriafly.salt.ui.Text
 import com.moriafly.salt.ui.UnstableSaltUiApi
 import com.moriafly.salt.ui.ext.safeMainPadding
+import compose.icons.FeatherIcons
+import compose.icons.FontAwesomeIcons
+import compose.icons.TablerIcons
+import compose.icons.feathericons.Pause
+import compose.icons.feathericons.Play
+import compose.icons.feathericons.SkipBack
+import compose.icons.feathericons.SkipForward
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.Pause
+import compose.icons.fontawesomeicons.solid.Play
+import compose.icons.tablericons.Cast
+import compose.icons.tablericons.PlayerPause
+import compose.icons.tablericons.PlayerPlay
+import compose.icons.tablericons.Playlist
+import compose.icons.tablericons.Share
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -341,7 +360,7 @@ fun BottomSheetPlayer(
                                                 modifier = modifier.padding(4.dp)
                                             ) {
                                                 Icon(
-                                                    painter = painterResource(id = R.drawable.ic_cast_24px),
+                                                    painter = rememberVectorPainter(TablerIcons.Cast),
                                                     contentDescription = "投送",
                                                     tint = LocalPlayerUIColor.current
                                                 )
@@ -351,7 +370,7 @@ fun BottomSheetPlayer(
                                                 modifier = modifier.padding(4.dp)
                                             ) {
                                                 Icon(
-                                                    painter = painterResource(id = R.drawable.ic_share),
+                                                    painter = rememberVectorPainter(TablerIcons.Share),
                                                     contentDescription = "分享",
                                                     tint = LocalPlayerUIColor.current
                                                 )
@@ -390,28 +409,36 @@ fun BottomSheetPlayer(
                                                 .padding(vertical = 8.dp),
                                         ) {
                                             // 歌曲标题和艺术家
-                                            Column(
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .align(Alignment.CenterVertically)
-                                            ) {
-                                                Text(
-                                                    text = title.toString(),
-                                                    style = SaltTheme.textStyles.main,
+                                            Row(Modifier.fillMaxWidth().weight(1f)) {
+                                                AnimatedVisibility(
                                                     modifier = Modifier
-                                                        .padding(horizontal = 4.dp, vertical = 2.dp)
-                                                        .basicMarquee(iterations = Int.MAX_VALUE),
-                                                    maxLines = 1,
-                                                    color = LocalPlayerUIColor.current
-                                                )
-                                                Text(
-                                                    text = artist.toString(),
-                                                    style = SaltTheme.textStyles.sub,
-                                                    modifier = Modifier
-                                                        .padding(horizontal = 4.dp, vertical = 2.dp),
-                                                    maxLines = 1,
-                                                    color = LocalPlayerUIColor.current
-                                                )
+                                                        .align(Alignment.CenterVertically),
+                                                    visible = horizontalPagerState.currentPage != 2,
+                                                    enter = fadeIn(),
+                                                    exit = fadeOut()
+                                                ) {
+                                                    Column(
+                                                        modifier = Modifier.fillMaxWidth()
+                                                    ) {
+                                                        Text(
+                                                            text = title.toString(),
+                                                            style = SaltTheme.textStyles.main,
+                                                            modifier = Modifier
+                                                                .padding(horizontal = 4.dp, vertical = 2.dp)
+                                                                .basicMarquee(iterations = Int.MAX_VALUE),
+                                                            maxLines = 1,
+                                                            color = LocalPlayerUIColor.current
+                                                        )
+                                                        Text(
+                                                            text = artist.toString(),
+                                                            style = SaltTheme.textStyles.sub,
+                                                            modifier = Modifier
+                                                                .padding(horizontal = 4.dp, vertical = 2.dp),
+                                                            maxLines = 1,
+                                                            color = LocalPlayerUIColor.current
+                                                        )
+                                                    }
+                                                }
                                             }
                                             // 部分控制按钮
                                             Row(
@@ -592,7 +619,7 @@ fun BottomSheetPlayer(
                                             // 上一首按钮
                                             Box(modifier = Modifier.weight(1f)) {
                                                 ResizableIconButton(
-                                                    icon = R.drawable.ic_music_prev,
+                                                    icon = FeatherIcons.SkipBack,
                                                     color = LocalPlayerUIColor.current,
                                                     modifier = Modifier
                                                         .size(32.dp)
@@ -608,13 +635,13 @@ fun BottomSheetPlayer(
                                             Box(modifier = Modifier.weight(1f)) {
                                                 ResizableIconButton(
                                                     icon = if (isPlaying) {
-                                                        R.drawable.pause
+                                                        TablerIcons.PlayerPause
                                                     } else {
-                                                        R.drawable.play
+                                                        TablerIcons.PlayerPlay
                                                     },
                                                     color = LocalPlayerUIColor.current,
                                                     modifier = Modifier
-                                                        .size(50.dp)
+                                                        .size(40.dp)
                                                         .align(Alignment.Center),
                                                     onClick = {
                                                         playerViewModel.togglePlayPause()
@@ -625,7 +652,7 @@ fun BottomSheetPlayer(
                                             // 下一首按钮
                                             Box(modifier = Modifier.weight(1f)) {
                                                 ResizableIconButton(
-                                                    icon = R.drawable.ic_music_next,
+                                                    icon = FeatherIcons.SkipForward,
                                                     color = LocalPlayerUIColor.current,
                                                     modifier = Modifier
                                                         .size(32.dp)
@@ -640,7 +667,7 @@ fun BottomSheetPlayer(
                                             // 播放列表按钮
                                             Box(modifier = Modifier.weight(1f)) {
                                                 ResizableIconButton(
-                                                    icon = R.drawable.ic_music_list,
+                                                    icon = 	TablerIcons.Playlist,
                                                     color = LocalPlayerUIColor.current,
                                                     modifier = Modifier
                                                         .size(32.dp)

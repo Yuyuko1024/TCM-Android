@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 
 @Composable
@@ -26,6 +28,31 @@ fun ResizableIconButton(
 ) {
     Image(
         painter = painterResource(icon),
+        contentDescription = null,
+        colorFilter = ColorFilter.tint(color),
+        modifier =
+            Modifier
+                .clickable(
+                    indication = indication ?: ripple(bounded = false),
+                    interactionSource = remember { MutableInteractionSource() },
+                    enabled = enabled,
+                    onClick = onClick,
+                ).alpha(if (enabled) 1f else 0.5f)
+                .then(modifier),
+    )
+}
+
+@Composable
+fun ResizableIconButton(
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    enabled: Boolean = true,
+    indication: Indication? = null,
+    onClick: () -> Unit = {},
+) {
+    Image(
+        painter = rememberVectorPainter(icon),
         contentDescription = null,
         colorFilter = ColorFilter.tint(color),
         modifier =

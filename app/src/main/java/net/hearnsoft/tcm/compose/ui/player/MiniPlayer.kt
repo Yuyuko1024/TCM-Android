@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -40,6 +41,10 @@ import com.moriafly.salt.ui.Icon
 import com.moriafly.salt.ui.SaltTheme
 import com.moriafly.salt.ui.Text
 import com.moriafly.salt.ui.UnstableSaltUiApi
+import compose.icons.TablerIcons
+import compose.icons.tablericons.PlayerPause
+import compose.icons.tablericons.PlayerPlay
+import compose.icons.tablericons.Playlist
 import net.hearnsoft.tcm.compose.R
 import net.hearnsoft.tcm.compose.ui.viewmodel.PlayerViewModel
 
@@ -186,7 +191,7 @@ private fun PlayerControls(
                 onClick = onPlaylistClick
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_music_list),
+                    painter = rememberVectorPainter(TablerIcons.Playlist),
                     contentDescription = "播放列表",
                     modifier = Modifier.size(24.dp)
                 )
@@ -236,13 +241,11 @@ fun PlayPauseButton(
             }
     ) {
         Icon(
-            painter = painterResource(
-                if (isPlaying) {
-                    R.drawable.pause
-                } else {
-                    R.drawable.play
-                }
-            ),
+            painter = if (isPlaying) {
+                rememberVectorPainter(TablerIcons.PlayerPause)
+            } else {
+                rememberVectorPainter(TablerIcons.PlayerPlay)
+            },
             contentDescription = null,
             modifier = Modifier
                 .size(24.dp)

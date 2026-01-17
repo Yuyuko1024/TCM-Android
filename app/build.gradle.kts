@@ -71,6 +71,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
             dexOptions {
                 preDexLibraries = true
                 dexInProcess = true
@@ -219,7 +220,13 @@ dependencies {
     implementation(libs.palette.ktx)
 
     // Accompanist Lyrics
-    implementation(libs.lyrics.ui)
+    /*implementation(libs.lyrics.ui)*/
+    val lyricsUiFile = file("libs/src.aar")
+    if (lyricsUiFile.exists()) {
+        implementation(files("libs/src.aar"))
+    } else {
+        implementation(libs.lyrics.ui)
+    }
     implementation(libs.lyrics.core)
 
     // AndroidX DataStore Preferences
@@ -251,6 +258,16 @@ dependencies {
     implementation(libs.devicecompat)
     // 权限请求框架：https://github.com/getActivity/XXPermissions
     implementation(libs.xxpermissions)
+
+    // Material
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.material.icons)
+
+    // Icons
+    implementation(libs.composeIcons.simpleIcons)
+    implementation(libs.composeIcons.feather)
+    implementation(libs.composeIcons.fontAwesome)
+    implementation(libs.composeIcons.tablerIcons)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

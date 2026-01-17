@@ -19,14 +19,14 @@ activityCompose = "1.10.1"
 composeBom = "2025.08.00"
 ksp = "2.2.10-2.0.2"
 animationGraphics = "1.9.0"
-lyricsCore = "0.3.1"
-lyricsUi = "1.0.6"
+lyricsCore = "0.3.4"
+lyricsUi = "1.0.8"
 navigationCompose = "2.9.0"
 navigationComposeAndroid = "2.9.0"
 renderscripToolkit = "1.0.2"
 retrofit = "2.11.0"
 roomRuntime = "2.7.2"
-saltUi = "2.8.0-alpha09"
+saltUi = "2.8.1"
 media3 = "1.8.0"
 arrow = "2.1.2"
 squigglyslider = "1.0.0"
@@ -36,6 +36,8 @@ hilt = "2.57"
 annotation = "1.8.2"
 palette = "1.0.0"
 xxpermissions = "26.5"
+androidxMaterial = "1.4.0"
+composeIcons = "1.1.1"
 
 [libraries]
 androidx-animation-graphics = { module = "androidx.compose.animation:animation-graphics", version.ref = "animationGraphics" }
@@ -92,6 +94,20 @@ annotation = { module = "androidx.annotation:annotation", version.ref = "annotat
 palette = { group = "androidx.palette", name = "palette", version.ref = "palette" }
 palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "palette" }
 xxpermissions = { module = "com.github.getActivity:XXPermissions", version.ref = "xxpermissions" }
+androidx-material = { module = "androidx.compose.material3:material3", version.ref = "androidxMaterial" }
+androidx-material-icons = { module = "androidx.compose.material:material-icons-extended-android", version.ref = "androidxMaterial" }
+
+
+composeIcons-cssGg = { module = "br.com.devsrsouza.compose.icons:css-gg", version.ref = "composeIcons" }
+composeIcons-weatherIcons = { module = "br.com.devsrsouza.compose.icons:erikflowers-weather-icons", version.ref = "composeIcons" }
+composeIcons-evaIcons = { module = "br.com.devsrsouza.compose.icons:eva-icons", version.ref = "composeIcons" }
+composeIcons-feather = { module = "br.com.devsrsouza.compose.icons:feather", version.ref = "composeIcons" }
+composeIcons-fontAwesome = { module = "br.com.devsrsouza.compose.icons:font-awesome", version.ref = "composeIcons" }
+composeIcons-lineAwesome = { module = "br.com.devsrsouza.compose.icons:line-awesome", version.ref = "composeIcons" }
+composeIcons-linea = { module = "br.com.devsrsouza.compose.icons:linea", version.ref = "composeIcons" }
+composeIcons-octicons = { module = "br.com.devsrsouza.compose.icons:octicons", version.ref = "composeIcons" }
+composeIcons-simpleIcons = { module = "br.com.devsrsouza.compose.icons:simple-icons", version.ref = "composeIcons" }
+composeIcons-tablerIcons = { module = "br.com.devsrsouza.compose.icons:tabler-icons", version.ref = "composeIcons" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
